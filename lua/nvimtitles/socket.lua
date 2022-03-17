@@ -2,29 +2,9 @@
 local uv = vim.loop
 local json = require'nvimtitles.json'
 local constants = require'nvimtitles.constants'
+local utils = require'nvimtitles.utils'
 
 local M = {}
-
-local function splitlines(str)
-  lines = {}
-  for l in str:gmatch('([^\n]*)\n') do
-    table.insert(lines, l)
-  end
-
-  return lines
-end
-
-local function encodecmd(params, request_id)
-  local cmd = {
-    command = params
-  }
-
-  if request_id and isnumber(request_id) then
-    cmd.request_id = request_id
-  end
-
-  return json.encode(cmd)
-end
 
 function M.connect()
   M.client = uv.new_pipe(false)
@@ -39,7 +19,7 @@ function M.connect()
 
       -- sometimes duplicate messages are sent with a newline
       -- this will deduplicate the messages
-      lines = splitlines(chunk)
+      lines = utils.split(chunk, '([^\n]*)\n')
 
       for i, l in ipairs(lines) do
         local success, msg, err = pcall(function() return json.decode(l) end)
@@ -81,14 +61,22 @@ function M.cycle_pause()
   M.write('cycle pause')
 end
 
-function M.get_time(fn)
-  local request_id = math.random(2048)
+local function encodecmd(params, request_id)
   local cmd = {
-    command = {'get_property', 'playback-time'},
-    request_id = request_id
+    command = params
   }
 
-  local data = json.encode(cmd)
+  if request_id and isnumber(request_id) then
+    cmd.request_id = request_id
+  end
+
+  return json.encode(cmd)
+end
+
+function M.get_time(fn)
+  local request_id = math.random(2048)
+  local cmd = {'get_property', 'playback-time'}
+  local data = encodecmd(cmd, request_id)
 
   M.queue[request_id] = function(msg)
     fn(msg.data)

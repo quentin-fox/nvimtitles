@@ -7,4 +7,8 @@ set cpo&vim
 
 " register commands
 
-autocmd ExitPre *.srt lua require'nvimtitles'.quit()
+autocmd ExitPre * lua require'nvimtitles'.quit()
+
+command -nargs=+ -complete=file PlayerOpenVideo lua require'nvimtitles'.player_open('video', "<args>")
+command -nargs=+ -complete=file PlayerOpenAudio lua require'nvimtitles'.player_open('audio', "<args>")
+command PlayerCyclePause lua require'nvimtitles'.cycle_pause()
