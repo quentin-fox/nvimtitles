@@ -7,4 +7,4 @@ set cpo&vim
 
 " register commands
 
-command! NVTStart lua require('nvimtitles.main').test()
+autocmd ExitPre *.srt lua require'nvimtitles'.quit()

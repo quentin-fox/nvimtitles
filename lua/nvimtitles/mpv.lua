@@ -34,8 +34,10 @@ function M.play(filename, mode, timestart, geometry)
     detached = true, -- so when nvim quits, mpv will quit
   }
 
-  uv.disable_stdio_inheritance()
-  uv.spawn('mpv', opts)
+  local handle, pid
+  handle, pid = uv.spawn('mpv', opts, function()
+    handle:close()
+  end)
 end
 
 return M

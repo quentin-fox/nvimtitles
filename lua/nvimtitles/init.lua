@@ -55,21 +55,33 @@ function M.connect()
   M.queue = {}
 end
 
-function M.write(data)
+function M.write(data, silent)
+  silent = silent or false
   -- newline is required to 'confirm' the command
   -- i.e. mpv buffers command inputs until a newline is received
+  if not M.client or uv.is_closing(M.client) then
+    local msg = "communication with mpv process is not open"
+
+    if not silent then
+      vim.notify(msg, vim.log.levels.ERROR)
+    end
+    return
+  end
+
   M.client:write(data .. '\n')
 end
 
 function M.close()
-  M.client:close()
+  if M.client then
+    M.client:close()
+  end
 end
 
 function M.cycle_pause()
-  M.write('cycle pauseee')
+  M.write('cycle pause')
 end
 
-function M.get_time()
+function M.get_time(fn)
   local request_id = math.random(2048)
   local cmd = {
     command = {'get_property', 'playback-time'},
@@ -79,7 +91,7 @@ function M.get_time()
   local data = json.encode(cmd)
 
   M.queue[request_id] = function(msg)
-    print(msg.data .. '\n')
+    fn(msg.data)
   end
 
   M.write(data)
@@ -127,7 +139,9 @@ function M.dec_speed(multiplier)
 end
 
 function M.quit()
-  M.write('quit')
+  local silent = true
+  M.write('quit', silent)
+  M.close()
 end
 
 return M
