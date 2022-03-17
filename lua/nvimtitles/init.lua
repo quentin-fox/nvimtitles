@@ -2,7 +2,7 @@
 local uv = vim.loop
 local json = require'nvimtitles.json'
 
-local SOCK = "/tmp/bnpipe"
+local SOCK = '/tmp/bnpipe'
 
 local M = {}
 
@@ -13,6 +13,18 @@ local function splitlines(str)
   end
 
   return lines
+end
+
+local function encodecmd(params, request_id)
+  local cmd = {
+    command = params
+  }
+
+  if request_id and isnumber(request_id) then
+    cmd.request_id = request_id
+  end
+
+  return json.encode(cmd)
 end
 
 function M.connect()
@@ -44,14 +56,34 @@ function M.connect()
   M.queue = {}
 end
 
-function M.pause()
-  M.client:write("cycle pause")
+function M.play(path)
+  local opts = {
+    args = { path },
+    detached = false,
+    stdio = { 0, 1, 2 }, -- tmp
+  }
+
+  uv.spawn('mpv', opts)
 end
 
-function M.timestamp()
+function M.write(data)
+  -- newline is required to 'confirm' the command
+  -- i.e. mpv buffers command inputs until a newline is received
+  M.client:write(data .. '\n')
+end
+
+function M.close()
+  M.client:close()
+end
+
+function M.cycle_pause()
+  M.write('cycle pause')
+end
+
+function M.get_time()
   local request_id = math.random(2048)
   local cmd = {
-    command = {"get_property", "playback-time"},
+    command = {'get_property', 'playback-time'},
     request_id = request_id
   }
 
@@ -61,11 +93,52 @@ function M.timestamp()
     print(msg.data .. '\n')
   end
 
-  M.client:write(data .. '\n')
+  M.write(data)
 end
 
-function M.close()
-  M.client:close()
+function M.seek(seconds)
+  local cmd = {'seek', tostring(seconds), 'relative'}
+  local data = encodecmd(cmd)
+  M.write(data)
+end
+
+function M.seek_abs(seconds)
+  local cmd = {'seek', tostring(seconds), 'absolute'}
+  local data = encodecmd(cmd)
+  M.write(data)
+end
+
+function M.loop(start, stop)
+  local cmda = {'set_property', 'ab-loop-a', start}
+  local dataa = encodecmd(cmda)
+
+  local cmdb = {'set_property', 'ab-loop-a', stop}
+  local datab = encodecmd(cmdb)
+
+  M.write(dataa)
+  M.write(datab)
+end
+
+function M.stop_loop()
+  M.write('ab-loop')
+end
+
+function M.inc_speed(multiplier)
+  multiplier = multiplier or 1.1
+  local cmd = {'multiply', 'speed', multiplier}
+  local data = encodecmd(cmd)
+  M.write(data)
+end
+
+function M.dec_speed(multiplier)
+  multiplier = multiplier or 1.1
+  local cmd = {'multiply', 'speed', 1 / multiplier}
+  local data = encodecmd(cmd)
+  M.write(data)
+end
+
+function M.quit()
+  M.write('quit')
 end
 
 return M
