@@ -2,7 +2,7 @@
 local uv = vim.loop
 local json = require'nvimtitles.json'
 
-local SOCK = '/tmp/bnpipe'
+local SOCK = '/tmp/nvimtitles.sock'
 
 local M = {}
 
