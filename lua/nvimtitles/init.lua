@@ -1,8 +1,7 @@
 -- same api as luv lua package, wraps libuv
 local uv = vim.loop
 local json = require'nvimtitles.json'
-
-local SOCK = '/tmp/nvimtitles.sock'
+local constants = require'nvimtitles.constants'
 
 local M = {}
 
@@ -29,7 +28,7 @@ end
 
 function M.connect()
   M.client = uv.new_pipe(false)
-  M.client:connect(SOCK, function(err)
+  M.client:connect(constants.SOCK, function(err)
     assert(not err, err)
 
     M.client:read_start(function(err, chunk)
@@ -56,16 +55,6 @@ function M.connect()
   M.queue = {}
 end
 
-function M.play(path)
-  local opts = {
-    args = { path },
-    detached = false,
-    stdio = { 0, 1, 2 }, -- tmp
-  }
-
-  uv.spawn('mpv', opts)
-end
-
 function M.write(data)
   -- newline is required to 'confirm' the command
   -- i.e. mpv buffers command inputs until a newline is received
@@ -77,7 +66,7 @@ function M.close()
 end
 
 function M.cycle_pause()
-  M.write('cycle pause')
+  M.write('cycle pauseee')
 end
 
 function M.get_time()
