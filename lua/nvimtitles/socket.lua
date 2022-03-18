@@ -66,7 +66,7 @@ local function encodecmd(params, request_id)
     command = params
   }
 
-  if request_id and isnumber(request_id) then
+  if request_id and type(request_id) == 'number' then
     cmd.request_id = request_id
   end
 
@@ -78,9 +78,10 @@ function M.get_time(fn)
   local cmd = {'get_property', 'playback-time'}
   local data = encodecmd(cmd, request_id)
 
-  M.queue[request_id] = function(msg)
+  -- wrap in case fn contains a vimL call
+  M.queue[request_id] = vim.schedule_wrap(function(msg)
     fn(msg.data)
-  end
+  end)
 
   M.write(data)
 end
@@ -112,18 +113,15 @@ function M.stop_loop()
   M.write('ab-loop')
 end
 
-function M.inc_speed(multiplier)
-  multiplier = multiplier or 1.1
+function M.multiply_speed(multiplier)
+  multiplier = multiplier
   local cmd = {'multiply', 'speed', multiplier}
   local data = encodecmd(cmd)
   M.write(data)
 end
 
-function M.dec_speed(multiplier)
-  multiplier = multiplier or 1.1
-  local cmd = {'multiply', 'speed', 1 / multiplier}
-  local data = encodecmd(cmd)
-  M.write(data)
+function M.reload_subs()
+  M.write('sub-reload')
 end
 
 function M.quit()
