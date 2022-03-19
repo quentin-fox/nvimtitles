@@ -65,9 +65,6 @@ function M.set_timestamp()
     local arrow_line_nr = buffer.get_last_arrow_timestamp()
     local single_ts_line_nr = buffer.get_last_single_timestamp()
 
-    print(blank_line_nr .. '\n')
-    print(arrow_line_nr .. '\n')
-    print(single_ts_line_nr .. '\n')
     ts = timestamp.tostring(seconds)
 
     if blank_line_nr == -1 and arrow_line_nr == -1 and single_ts_line_nr == -1 then
