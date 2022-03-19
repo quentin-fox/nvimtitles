@@ -3,6 +3,7 @@ local mpv = require'nvimtitles.mpv'
 local utils = require'nvimtitles.utils'
 local buffer = require'nvimtitles.buffer'
 local constants = require'nvimtitles.constants'
+local timestamp = require'nvimtitles.timestamp'
 
 local uv = vim.loop
 
@@ -17,7 +18,7 @@ function M.player_open(mode, argstr)
 
   mpv.play(filename, mode, timestart, geometry)
 
-  -- todo add backoff to try reconnecting if mpv opens slowly
+  -- todo add backoff to try reconnecting
   vim.defer_fn(function()
     socket.connect()
     vim.notify("Connected to mpv")
@@ -59,14 +60,22 @@ function M.dec_speed()
 end
 
 function M.set_timestamp()
-  local function fn(time)
-    local line_nr = buffer.get_last_blank_line()
-    local text = tostring(time) .. constants.ARROW
+  local function fn(seconds)
+    local blank_line_nr = buffer.get_last_blank_line()
+    local arrow_line_nr = buffer.get_last_arrow_timestamp()
+    local single_ts_line_nr = buffer.get_last_single_timestamp()
 
-    if line_nr == -1 then
-      buffer.insert_line(0, text)
-    else
-      buffer.replace_line(line_nr, text)
+    print(blank_line_nr .. '\n')
+    print(arrow_line_nr .. '\n')
+    print(single_ts_line_nr .. '\n')
+    ts = timestamp.tostring(seconds)
+
+    if blank_line_nr == -1 and arrow_line_nr == -1 and single_ts_line_nr == -1 then
+      buffer.insert_line(0, ts)
+    elseif blank_line_nr > arrow_line_nr and blank_line_nr > single_ts_line_nr then
+      buffer.replace_line(blank_line_nr, ts)
+    elseif single_ts_line_nr > blank_line_nr then
+      buffer.append_line(single_ts_line_nr, constants.ARROW .. ts)
     end
   end
 

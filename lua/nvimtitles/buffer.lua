@@ -16,8 +16,12 @@ function M.get_last_full_timestamp()
   return get_row(constants.FULL_TS_FORMAT)
 end
 
-function M.get_last_partial_timestamp()
+function M.get_last_arrow_timestamp()
   return get_row(constants.ARROW)
+end
+
+function M.get_last_single_timestamp()
+  return get_row(constants.SINGLE_TS_FORMAT)
 end
 
 function M.get_last_blank_line()
@@ -48,7 +52,7 @@ function M.append_line(line_nr, text)
 
   local lines = vim.api.nvim_buf_get_lines(current_buffer, line_nr, line_nr + 1, strict_indexing)
   local new_line = lines[1] .. text
-  M.replace_line(line_nr, text)
+  M.replace_line(line_nr, new_line)
 end
 
 return M
