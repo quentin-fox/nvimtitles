@@ -53,4 +53,12 @@ function TestFromString:testMs()
   lu.assertEquals(seconds, 151.028)
 end
 
+TestSplit = {}
+
+function TestSplit.test()
+  ts1, ts2 = timestamp.split("00:00:00,000 --> 00:00:15,123")
+  lu.assertEquals(ts1, "00:00:00,000")
+  lu.assertEquals(ts2, "00:00:15,123")
+end
+
 os.exit(lu.LuaUnit.run())

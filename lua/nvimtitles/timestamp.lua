@@ -37,4 +37,13 @@ function M.fromstring(ts)
   return seconds
 end
 
+-- splits a full timestamp with arrow split
+-- returns both timestamps as strings
+-- assumes that the full_ts passed in is already in the correct format
+function M.split(full_ts)
+  local pattern = "^(.*) %-%-> (.*)$"
+  local ts1, ts2 = full_ts:match(pattern)
+  return ts1, ts2
+end
+
 return M
