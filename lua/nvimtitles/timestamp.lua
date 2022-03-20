@@ -24,6 +24,18 @@ function M.tostring(seconds)
   return ts .. ',' .. ms
 end
 
+-- parses a string like 15:52 or 9:10 to seconds
+function M.fromshortstring(ts)
+  local pattern = "(%d+):(%d%d)"
+  local m, s = ts:match(pattern)
+
+  local seconds = 0
+  seconds = seconds + tonumber(s)
+  seconds = seconds + (tonumber(m) * 60)
+
+  return seconds
+end
+
 function M.fromstring(ts)
   local pattern = "(%d+):(%d%d):(%d%d),(%d%d%d)"
   local h, m, s, ms = ts:match(pattern)

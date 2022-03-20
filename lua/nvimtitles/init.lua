@@ -137,6 +137,31 @@ function M.loop()
   socket.loop(seconds1, seconds2)
 end
 
+function M.stop_loop()
+  socket.stop_loop()
+end
+
+function M.seek(arg)
+  local seconds
+
+  if arg:match(":") then
+    -- either as the mm:ss or m:ss format
+    if arg:len() == 4 or arg:len() == 5 then
+      seconds = timestamp.fromshortstring(arg)
+    elseif arg:len() == 12 then
+      -- uses full ts format (hh:mm:ss,mss)
+      seconds = timestamp.fromstring(arg)
+    else
+      -- todo handle case with incorrectly formatted timestamp
+      return
+    end
+  else
+    seconds = tonumber(arg)
+  end
+
+  socket.seek_abs(seconds)
+end
+
 function M.quit()
   socket.quit()
 end
