@@ -24,4 +24,17 @@ function M.tostring(seconds)
   return ts .. ',' .. ms
 end
 
+function M.fromstring(ts)
+  local pattern = "(%d+):(%d%d):(%d%d),(%d%d%d)"
+  local h, m, s, ms = ts:match(pattern)
+
+  local seconds = 0
+  seconds = seconds + tonumber(s)
+  seconds = seconds + (tonumber(m) * 60)
+  seconds = seconds + (tonumber(h) * 60 * 60)
+  seconds = seconds + (tonumber(ms) / 1000)
+
+  return seconds
+end
+
 return M

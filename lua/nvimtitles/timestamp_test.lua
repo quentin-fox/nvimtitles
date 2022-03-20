@@ -31,4 +31,26 @@ function TestToString:testMsLong()
   lu.assertEquals(ts, '00:01:35,119')
 end
 
+TestFromString = {}
+
+function TestFromString:testZero()
+  seconds = timestamp.fromstring("00:00:00,000")
+  lu.assertEquals(seconds, 0)
+end
+
+function TestFromString:testOne()
+  seconds = timestamp.fromstring("00:00:01,000")
+  lu.assertEquals(seconds, 1)
+end
+
+function TestFromString:testMinute()
+  seconds = timestamp.fromstring("00:02:31,000")
+  lu.assertEquals(seconds, 151)
+end
+
+function TestFromString:testMs()
+  seconds = timestamp.fromstring("00:02:31,028")
+  lu.assertEquals(seconds, 151.028)
+end
+
 os.exit(lu.LuaUnit.run())
