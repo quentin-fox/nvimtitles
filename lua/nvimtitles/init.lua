@@ -94,6 +94,49 @@ function M.set_timestamp()
   socket.get_time(fn)
 end
 
+function M.seek_by_start()
+  local ts_line_nr = buffer.get_last_partial_timestamp()
+  local ts_line = buffer.get_line(ts_line_nr)
+  local ts = timestamp.first(ts_line)
+
+  if not ts then
+    return
+  end
+
+  local seconds = timestamp.fromstring(ts)
+  socket.seek_abs(seconds)
+end
+
+function M.seek_by_stop()
+  local ts_line_nr = buffer.get_last_full_timestamp()
+  local ts_line = buffer.get_line(ts_line_nr)
+
+  local _, ts = timestamp.split(ts_line)
+
+  if not ts then
+    return
+  end
+
+  local seconds = timestamp.fromstring(ts)
+  socket.seek_abs(seconds)
+end
+
+function M.loop()
+  local ts_line_nr = buffer.get_last_full_timestamp()
+  local ts_line = buffer.get_line(ts_line_nr)
+
+  local ts1, ts2 = timestamp.split(ts_line)
+
+  if not ts1 or not ts2 then
+    return
+  end
+
+  local seconds1 = timestamp.fromstring(ts1)
+  local seconds2 = timestamp.fromstring(ts2)
+
+  socket.loop(seconds1, seconds2)
+end
+
 function M.quit()
   socket.quit()
 end

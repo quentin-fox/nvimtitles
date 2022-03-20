@@ -61,4 +61,21 @@ function TestSplit.test()
   lu.assertEquals(ts2, "00:00:15,123")
 end
 
+TestFirst = {}
+
+function TestFirst:testSingle()
+  ts = timestamp.first("00:00:00,000")
+  lu.assertEquals(ts, "00:00:00,000")
+end
+
+function TestFirst:testSingleWithArrow()
+  ts = timestamp.first("00:00:15,000 -->")
+  lu.assertEquals(ts, "00:00:15,000")
+end
+
+function TestFirst:testPair()
+  ts = timestamp.first("00:00:15,000 --> 00:00:34,000")
+  lu.assertEquals(ts, "00:00:15,000")
+end
+
 os.exit(lu.LuaUnit.run())

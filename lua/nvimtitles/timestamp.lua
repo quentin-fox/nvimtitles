@@ -46,4 +46,12 @@ function M.split(full_ts)
   return ts1, ts2
 end
 
+-- returns the first timestamp encountered in a line
+function M.first(line)
+  local pattern = "(%d+:%d%d:%d%d,%d%d%d).*"
+  local ts = line:match(pattern)
+
+  return ts
+end
+
 return M
