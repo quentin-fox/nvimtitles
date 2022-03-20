@@ -18,11 +18,26 @@ function M.player_open(mode, argstr)
 
   mpv.play(filename, mode, timestart, geometry)
 
-  -- todo add backoff to try reconnecting
+  -- run whenever the socket connects successfully
+  local function resolve()
+    vim.defer_fn(function()
+      vim.notify("Connected to mpv")
+    end, 0)
+  end
+
+  -- is run the first time the socket fails to connect
+  -- the second time it fails (after a backoff) it will bubble the error
+  -- this lets mpv connect quickly if it's already booted up
+  -- but not throw errors if it's slow to start
+  local function reject()
+    vim.defer_fn(function()
+      socket.connect(resolve)
+    end, 2000)
+  end
+
   vim.defer_fn(function()
-    socket.connect()
-    vim.notify("Connected to mpv")
-  end, 2000)
+    socket.connect(resolve, reject)
+  end, 250)
 end
 
 function M.cycle_pause()

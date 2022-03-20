@@ -6,10 +6,19 @@ local utils = require'nvimtitles.utils'
 
 local M = {}
 
-function M.connect()
+function M.connect(resolve, reject)
   M.client = uv.new_pipe(false)
   M.client:connect(constants.SOCK, function(err)
-    assert(not err, err)
+    if err then
+      if reject then
+        reject()
+        return
+      end
+
+      assert(not err, err)
+    end
+
+    resolve()
 
     M.client:read_start(function(err, chunk)
       if not chunk then
