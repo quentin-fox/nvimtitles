@@ -98,4 +98,6 @@ function M.set_lines()
     -1,
     STRICT_INDEXING
   )
+end
+
 return M
