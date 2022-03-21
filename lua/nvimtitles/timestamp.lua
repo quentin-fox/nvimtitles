@@ -26,7 +26,7 @@ end
 
 -- parses a string like 15:52 or 9:10 to seconds
 function M.fromshortstring(ts)
-  local pattern = "(%d+):(%d%d)"
+  local pattern = '(%d+):(%d%d)'
   local m, s = ts:match(pattern)
 
   local seconds = 0
@@ -37,7 +37,7 @@ function M.fromshortstring(ts)
 end
 
 function M.fromstring(ts)
-  local pattern = "(%d+):(%d%d):(%d%d),(%d%d%d)"
+  local pattern = '(%d+):(%d%d):(%d%d),(%d%d%d)'
   local h, m, s, ms = ts:match(pattern)
 
   local seconds = 0
@@ -53,14 +53,14 @@ end
 -- returns both timestamps as strings
 -- assumes that the full_ts passed in is already in the correct format
 function M.split(full_ts)
-  local pattern = "^(.*) %-%-> (.*)$"
+  local pattern = '^(.*) %-%-> (.*)$'
   local ts1, ts2 = full_ts:match(pattern)
   return ts1, ts2
 end
 
 -- returns the first timestamp encountered in a line
 function M.first(line)
-  local pattern = "(%d+:%d%d:%d%d,%d%d%d).*"
+  local pattern = '(%d+:%d%d:%d%d,%d%d%d).*'
   local ts = line:match(pattern)
 
   return ts

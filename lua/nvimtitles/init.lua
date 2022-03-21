@@ -21,7 +21,7 @@ function M.player_open(mode, argstr)
   -- run whenever the socket connects successfully
   local function resolve()
     vim.defer_fn(function()
-      vim.notify("Connected to mpv")
+      vim.notify('Connected to mpv')
     end, 0)
   end
 
@@ -63,7 +63,11 @@ function M.inc_speed()
   local multiplier = vim.g.nvimtitles_speed_shift_multiplier
   multiplier = multiplier or 1.1
 
-  socket.multiply_speed(multiplier)
+  local function fn(speed)
+    vim.notify('Playback speed: ' .. speed .. 'x')
+  end
+
+  socket.multiply_speed(multiplier, fn)
 end
 
 function M.dec_speed()
@@ -71,7 +75,12 @@ function M.dec_speed()
   multiplier = multiplier or 1.1
 
   multiplier = 1 / multiplier
-  socket.multiply_speed(multiplier)
+
+  local function fn(speed)
+    vim.notify('Playback speed: ' .. speed .. 'x')
+  end
+
+  socket.multiply_speed(multiplier, fn)
 end
 
 function M.set_timestamp()
@@ -144,7 +153,7 @@ end
 function M.seek(arg)
   local seconds
 
-  if arg:match(":") then
+  if arg:match(':') then
     -- either as the mm:ss or m:ss format
     if arg:len() == 4 or arg:len() == 5 then
       seconds = timestamp.fromshortstring(arg)
@@ -183,6 +192,7 @@ function M.find_current_sub()
     end
 
     if found_line == -1 then
+      vim.notify('No subtitle found for current timestamp.')
       return
     end
 

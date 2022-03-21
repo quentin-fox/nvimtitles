@@ -34,48 +34,48 @@ end
 TestFromString = {}
 
 function TestFromString:testZero()
-  seconds = timestamp.fromstring("00:00:00,000")
+  seconds = timestamp.fromstring('00:00:00,000')
   lu.assertEquals(seconds, 0)
 end
 
 function TestFromString:testOne()
-  seconds = timestamp.fromstring("00:00:01,000")
+  seconds = timestamp.fromstring('00:00:01,000')
   lu.assertEquals(seconds, 1)
 end
 
 function TestFromString:testMinute()
-  seconds = timestamp.fromstring("00:02:31,000")
+  seconds = timestamp.fromstring('00:02:31,000')
   lu.assertEquals(seconds, 151)
 end
 
 function TestFromString:testMs()
-  seconds = timestamp.fromstring("00:02:31,028")
+  seconds = timestamp.fromstring('00:02:31,028')
   lu.assertEquals(seconds, 151.028)
 end
 
 TestSplit = {}
 
 function TestSplit.test()
-  ts1, ts2 = timestamp.split("00:00:00,000 --> 00:00:15,123")
-  lu.assertEquals(ts1, "00:00:00,000")
-  lu.assertEquals(ts2, "00:00:15,123")
+  ts1, ts2 = timestamp.split('00:00:00,000 --> 00:00:15,123')
+  lu.assertEquals(ts1, '00:00:00,000')
+  lu.assertEquals(ts2, '00:00:15,123')
 end
 
 TestFirst = {}
 
 function TestFirst:testSingle()
-  ts = timestamp.first("00:00:00,000")
-  lu.assertEquals(ts, "00:00:00,000")
+  ts = timestamp.first('00:00:00,000')
+  lu.assertEquals(ts, '00:00:00,000')
 end
 
 function TestFirst:testSingleWithArrow()
-  ts = timestamp.first("00:00:15,000 -->")
-  lu.assertEquals(ts, "00:00:15,000")
+  ts = timestamp.first('00:00:15,000 -->')
+  lu.assertEquals(ts, '00:00:15,000')
 end
 
 function TestFirst:testPair()
-  ts = timestamp.first("00:00:15,000 --> 00:00:34,000")
-  lu.assertEquals(ts, "00:00:15,000")
+  ts = timestamp.first('00:00:15,000 --> 00:00:34,000')
+  lu.assertEquals(ts, '00:00:15,000')
 end
 
 os.exit(lu.LuaUnit.run())
