@@ -162,6 +162,41 @@ function M.seek(arg)
   socket.seek_abs(seconds)
 end
 
+function M.find_current_sub()
+  local function fn(seconds)
+    local lines = buffer.get_lines()
+
+    local found_line = -1
+    for line_num, line in ipairs(lines) do
+      -- returns nil, nil if the line is not a timestamp line
+      local ts1, ts2 = timestamp.split(line)
+
+      if ts1 and ts2 then
+        local seconds1 = timestamp.fromstring(ts1)
+        local seconds2 = timestamp.fromstring(ts2)
+
+        if seconds >= seconds1 and seconds <= seconds2 then
+          found_line = line_num
+          break
+        end
+      end
+    end
+
+    if found_line == -1 then
+      return
+    end
+
+    -- both lua and the cursor rows are 1-indexed
+    -- so only add 1 to go to the text below the timestamp
+    local row = found_line + 1
+    local col = 0
+
+    vim.api.nvim_win_set_cursor(0, {row, col})
+  end
+
+  socket.get_time(fn)
+end
+
 function M.quit()
   socket.quit()
 end
