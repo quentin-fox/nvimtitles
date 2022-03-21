@@ -197,6 +197,49 @@ function M.find_current_sub()
   socket.get_time(fn)
 end
 
+function M.add_sub_numbers()
+  local lines = buffer.get_lines()
+
+  -- array of line numbers that sub numbers should be added to
+  local to_add = {}
+
+  for line_num, line in ipairs(lines) do
+    local ts1, ts2 = timestamp.split(line)
+
+    if ts1 and ts2 then
+      table.insert(to_add, line_num)
+    end
+  end
+
+  for num, line_num in ipairs(to_add) do
+    buffer.insert_line(line_num + num - 2, tostring(num))
+  end
+end
+
+function M.remove_sub_numbers()
+  local lines = buffer.get_lines()
+
+  local to_delete = {}
+
+  for line_num, line in ipairs(lines) do
+    -- check if the next line is a timestamp
+    local next_line = lines[line_num + 1]
+
+    if next_line then
+      local ts1, ts2 = timestamp.split(next_line)
+
+      -- and the current line is a single number
+      if ts1 and ts2 and line:match('^%d+$') then
+        table.insert(to_delete, 1, line_num)
+      end
+    end
+  end
+
+  for _, line_num in ipairs(to_delete) do
+    buffer.delete_line(line_num - 1)
+  end
+end
+
 function M.quit()
   socket.quit()
 end

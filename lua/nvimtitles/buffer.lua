@@ -61,6 +61,18 @@ function M.replace_line(line_nr, text)
   )
 end
 
+function M.delete_line(line_nr)
+  local lines = {}
+
+  vim.api.nvim_buf_set_lines(
+    CURRENT_BUFFER,
+    line_nr,
+    line_nr + 1,
+    STRICT_INDEXING,
+    lines
+  )
+end
+
 function M.append_line(line_nr, text)
   local lines = vim.api.nvim_buf_get_lines(
     CURRENT_BUFFER,
@@ -84,15 +96,6 @@ end
 
 function M.get_lines()
   return vim.api.nvim_buf_get_lines(
-    CURRENT_BUFFER,
-    0,
-    -1,
-    STRICT_INDEXING
-  )
-end
-
-function M.set_lines()
-  vim.api.nvim_buf_set_lines(
     CURRENT_BUFFER,
     0,
     -1,
