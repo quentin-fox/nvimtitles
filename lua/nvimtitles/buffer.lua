@@ -67,4 +67,14 @@ function M.get_line(line_nr)
   return lines[1]
 end
 
+function M.get_lines()
+  local current_buffer = 0
+  local strict_indexing = 0
+  return vim.api.nvim_buf_get_lines(current_buffer, 0, -1, strict_indexing)
+end
+
+function M.set_lines()
+  local current_buffer = 0
+  local strict_indexing = 0
+  vim.api.nvim_buf_set_lines(current_buffer, 0, -1, strict_indexing)
 return M
