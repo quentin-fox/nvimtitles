@@ -8,7 +8,7 @@ function M.play(filename, mode, timestart, geometry)
   timestart = timestart or '0:00'
   geometry = geometry or '50%x50%'
 
-  args = {
+  local args = {
     filename,
     '--input-ipc-server=' .. constants.SOCK,
   }
@@ -17,7 +17,7 @@ function M.play(filename, mode, timestart, geometry)
     table.insert(args, '--geometry=' .. geometry)
   end
 
-  extraArgs = {
+  local extraArgs = {
     '--really-quiet',
     '--sub-auto=fuzzy', -- subs loaded if they fuzzy match the filename
     '--start=' .. timestart,
@@ -34,8 +34,8 @@ function M.play(filename, mode, timestart, geometry)
     detached = true, -- so when nvim quits, mpv will quit
   }
 
-  local handle, pid
-  handle, pid = uv.spawn('mpv', opts, function()
+  local handle
+  handle, _ = uv.spawn('mpv', opts, function()
     handle:close()
   end)
 end

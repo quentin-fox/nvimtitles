@@ -5,16 +5,14 @@ local buffer = require'nvimtitles.buffer'
 local constants = require'nvimtitles.constants'
 local timestamp = require'nvimtitles.timestamp'
 
-local uv = vim.loop
-
 local M = {}
 
 function M.player_open(mode, argstr)
   local args = utils.split(argstr, '%S+')
 
-  filename = args[1]
-  timestart = args[2]
-  geometry = args[3]
+  local filename = args[1]
+  local timestart = args[2]
+  local geometry = args[3]
 
   mpv.play(filename, mode, timestart, geometry)
 
@@ -89,7 +87,7 @@ function M.set_timestamp()
     local arrow_line_nr = buffer.get_last_arrow_timestamp()
     local single_ts_line_nr = buffer.get_last_single_timestamp()
 
-    ts = timestamp.tostring(seconds)
+    local ts = timestamp.tostring(seconds)
 
     if blank_line_nr == -1 and arrow_line_nr == -1 and single_ts_line_nr == -1 then
       buffer.insert_line(0, ts)
@@ -144,10 +142,12 @@ function M.loop()
   local seconds2 = timestamp.fromstring(ts2)
 
   socket.loop(seconds1, seconds2)
+  vim.notify('Looping between ' .. ts1 .. ' and ' .. ts2)
 end
 
 function M.stop_loop()
   socket.stop_loop()
+  vim.notify("Loop stopped")
 end
 
 function M.seek(arg)
@@ -247,6 +247,28 @@ function M.remove_sub_numbers()
 
   for _, line_num in ipairs(to_delete) do
     buffer.delete_line(line_num - 1)
+  end
+end
+
+function M.reload_subs()
+  socket.reload_subs()
+end
+
+function M.shift_subs(arg)
+  local lines = buffer.get_lines()
+
+  local shift = tonumber(arg)
+
+  for line_num, line in ipairs(lines) do
+    local ts1, ts2 = timestamp.split(line)
+
+    if ts1 and ts2 then
+      local seconds1 = math.max(timestamp.fromstring(ts1) + shift, 0)
+      local seconds2 = math.max(timestamp.fromstring(ts2) + shift, 0)
+      local new_line = timestamp.tostring(seconds1) .. constants.ARROW .. timestamp.tostring(seconds2)
+
+      buffer.replace_line(line_num - 1, new_line)
+    end
   end
 end
 

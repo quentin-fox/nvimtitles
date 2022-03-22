@@ -1,7 +1,7 @@
 local M = {}
 
 function M.split(str, sep)
-  lines = {}
+  local lines = {}
   for l in str:gmatch(sep) do
     table.insert(lines, l)
   end

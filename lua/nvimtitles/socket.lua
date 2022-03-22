@@ -28,10 +28,10 @@ function M.connect(resolve, reject)
 
       -- sometimes duplicate messages are sent with a newline
       -- this will deduplicate the messages
-      lines = utils.split(chunk, '([^\n]*)\n')
+      local lines = utils.split(chunk, '([^\n]*)\n')
 
-      for i, l in ipairs(lines) do
-        local success, msg, err = pcall(function() return json.decode(l) end)
+      for _, l in ipairs(lines) do
+        local success, msg, _ = pcall(function() return json.decode(l) end)
 
         if success and msg.request_id and M.queue[msg.request_id] then
           M.queue[msg.request_id](msg)
