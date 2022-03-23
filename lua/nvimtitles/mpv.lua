@@ -18,7 +18,7 @@ function M.play(filename, mode, timestart, geometry)
   end
 
   local extraArgs = {
-    '--really-quiet',
+    '--msg-level=all=error', -- only echo error messages to stdout
     '--sub-auto=fuzzy', -- subs loaded if they fuzzy match the filename
     '--start=' .. timestart,
     '--pause', -- starts the video paused
@@ -29,14 +29,26 @@ function M.play(filename, mode, timestart, geometry)
     table.insert(args, arg)
   end
 
+  local stdout = uv.new_pipe()
+
   local opts = {
     args = args,
-    detached = true, -- so when nvim quits, mpv will quit
+    detached = false, -- so when nvim quits, mpv will quit
+    stdio = {nil, stdout, nil}
   }
 
   local handle
   handle, _ = uv.spawn('mpv', opts, function()
     handle:close()
+  end)
+
+  stdout:read_start(function(err, data)
+    assert(not err, err)
+    if data then
+      vim.defer_fn(function()
+        vim.notify(data, vim.log.levels.ERROR)
+      end, 0)
+    end
   end)
 end
 
