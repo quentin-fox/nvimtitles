@@ -296,6 +296,7 @@ function M.setup()
   vim.keymap.set('n', '+', M.seek_by_stop, opts)
   vim.keymap.set('n', '[[', M.dec_speed, opts)
   vim.keymap.set('n', ']]', M.inc_speed, opts)
+  vim.keymap.set('n', '\\', M.find_current_sub, opts)
 
   vim.api.nvim_create_autocmd('ExitPre', {
     buffer = 0,
@@ -307,8 +308,6 @@ function M.setup()
 
   vim.cmd([[command! PlayerLoop lua require'nvimtitles'.loop()]])
   vim.cmd([[command! PlayerStopLoop lua require'nvimtitles'.stop_loop()]])
-
-  vim.cmd([[command! FindCurrentSub lua require'nvimtitles'.find_current_sub()]])
 
   vim.cmd([[command! -nargs=1 PlayerSeekAbs lua require'nvimtitles'.seek("<args>")]])
 
