@@ -1,5 +1,5 @@
 local uv = vim.loop
-local constants = require'nvimtitles.constants'
+local constants = require 'nvimtitles.constants'
 
 local M = {}
 
@@ -34,7 +34,7 @@ function M.play(filename, mode, timestart, geometry)
   local opts = {
     args = args,
     detached = false, -- so when nvim quits, mpv will quit
-    stdio = {nil, stdout, nil}
+    stdio = { nil, stdout, nil }
   }
 
   local handle

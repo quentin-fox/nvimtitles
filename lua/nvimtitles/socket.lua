@@ -1,8 +1,9 @@
+---@diagnostic disable: need-check-nil
 -- same api as luv lua package, wraps libuv
 local uv = vim.loop
-local json = require'nvimtitles.json'
-local constants = require'nvimtitles.constants'
-local utils = require'nvimtitles.utils'
+local json = require 'nvimtitles.json'
+local constants = require 'nvimtitles.constants'
+local utils = require 'nvimtitles.utils'
 
 local M = {}
 
@@ -33,9 +34,14 @@ function M.connect(resolve, reject)
       for _, l in ipairs(lines) do
         local success, msg, _ = pcall(function() return json.decode(l) end)
 
-        if success and msg.request_id and M.queue[msg.request_id] then
-          M.queue[msg.request_id](msg)
-          M.queue[msg.request_id] = nil
+        if success then
+          ---@diagnostic disable-next-line: undefined-field
+          local request_id = msg.request_id
+
+          if request_id and M.queue[request_id] then
+            M.queue[request_id](msg)
+            M.queue[request_id] = nil
+          end
         end
       end
     end)
@@ -84,7 +90,7 @@ end
 
 function M.get_time(fn)
   local request_id = math.random(2048)
-  local cmd = {'get_property', 'playback-time'}
+  local cmd = { 'get_property', 'playback-time' }
   local data = encodecmd(cmd, request_id)
 
   -- wrap in case fn contains a vimL call
@@ -96,22 +102,22 @@ function M.get_time(fn)
 end
 
 function M.seek(seconds)
-  local cmd = {'seek', tostring(seconds), 'relative'}
+  local cmd = { 'seek', tostring(seconds), 'relative' }
   local data = encodecmd(cmd)
   M.write(data)
 end
 
 function M.seek_abs(seconds)
-  local cmd = {'seek', tostring(seconds), 'absolute'}
+  local cmd = { 'seek', tostring(seconds), 'absolute' }
   local data = encodecmd(cmd)
   M.write(data)
 end
 
 function M.loop(start, stop)
-  local cmda = {'set_property', 'ab-loop-a', start}
+  local cmda = { 'set_property', 'ab-loop-a', start }
   local dataa = encodecmd(cmda)
 
-  local cmdb = {'set_property', 'ab-loop-a', stop}
+  local cmdb = { 'set_property', 'ab-loop-a', stop }
   local datab = encodecmd(cmdb)
 
   M.write(dataa)
@@ -124,7 +130,7 @@ end
 
 function M.multiply_speed(multiplier, fn)
   multiplier = multiplier
-  local cmd1 = {'multiply', 'speed', multiplier}
+  local cmd1 = { 'multiply', 'speed', multiplier }
   local data1 = encodecmd(cmd1)
 
   M.write(data1)
@@ -134,7 +140,7 @@ function M.multiply_speed(multiplier, fn)
   end
 
   local request_id = math.random(2048)
-  local cmd2 = {'get_property', 'speed'}
+  local cmd2 = { 'get_property', 'speed' }
   local data2 = encodecmd(cmd2, request_id)
 
   M.queue[request_id] = vim.schedule_wrap(function(msg)

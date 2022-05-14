@@ -1,4 +1,4 @@
-local constants = require'nvimtitles.constants'
+local constants = require 'nvimtitles.constants'
 
 local M = {}
 
@@ -37,7 +37,7 @@ end
 
 -- inserts text at the given line_nr, pushing any existing text in that spot downwards
 function M.insert_line(line_nr, text)
-  local lines = {text}
+  local lines = { text }
 
   vim.api.nvim_buf_set_lines(
     CURRENT_BUFFER,
@@ -50,7 +50,7 @@ end
 
 -- replaces all the text at a given line_nr with the provided text
 function M.replace_line(line_nr, text)
-  local lines = {text}
+  local lines = { text }
 
   vim.api.nvim_buf_set_lines(
     CURRENT_BUFFER,
