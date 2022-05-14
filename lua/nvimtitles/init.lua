@@ -1,9 +1,9 @@
-local socket = require'nvimtitles.socket'
-local mpv = require'nvimtitles.mpv'
-local utils = require'nvimtitles.utils'
-local buffer = require'nvimtitles.buffer'
-local constants = require'nvimtitles.constants'
-local timestamp = require'nvimtitles.timestamp'
+local socket = require 'nvimtitles.socket'
+local mpv = require 'nvimtitles.mpv'
+local utils = require 'nvimtitles.utils'
+local buffer = require 'nvimtitles.buffer'
+local constants = require 'nvimtitles.constants'
+local timestamp = require 'nvimtitles.timestamp'
 
 local M = {}
 
@@ -201,7 +201,7 @@ function M.find_current_sub()
     local row = found_line + 1
     local col = 0
 
-    vim.api.nvim_win_set_cursor(0, {row, col})
+    vim.api.nvim_win_set_cursor(0, { row, col })
   end
 
   socket.get_time(fn)
@@ -274,6 +274,50 @@ end
 
 function M.quit()
   socket.quit()
+end
+
+function M.setup()
+  vim.filetype.add({
+    extension = {
+      srt = "subtitle"
+    }
+  })
+
+  local opts = {
+    silent = true,
+    buffer = true
+  }
+
+  vim.keymap.set('n', '-', M.seek_backward, opts)
+  vim.keymap.set('n', '=', M.seek_forward, opts)
+  vim.keymap.set('n', '<Cr>', M.cycle_pause, opts)
+  vim.keymap.set('n', '<Bar>', M.set_timestamp, opts)
+  vim.keymap.set('n', '_', M.seek_by_start, opts)
+  vim.keymap.set('n', '+', M.seek_by_stop, opts)
+  vim.keymap.set('n', '[[', M.dec_speed, opts)
+  vim.keymap.set('n', ']]', M.inc_speed, opts)
+
+  vim.api.nvim_create_autocmd('ExitPre', {
+    buffer = 0,
+    callback = M.quit,
+  })
+
+  vim.cmd([[command! -nargs=+ -complete=file PlayerOpenVideo lua require'nvimtitles'.player_open('video', "<args>")]])
+  vim.cmd([[command! -nargs=+ -complete=file PlayerOpenVideo lua require'nvimtitles'.player_open('audio', "<args>")]])
+
+  vim.cmd([[command! PlayerLoop lua require'nvimtitles'.loop()]])
+  vim.cmd([[command! PlayerStopLoop lua require'nvimtitles'.stop_loop()]])
+
+  vim.cmd([[command! FindCurrentSub lua require'nvimtitles'.find_current_sub()]])
+
+  vim.cmd([[command! -nargs=1 PlayerSeekAbs lua require'nvimtitles'.seek("<args>")]])
+
+  vim.cmd([[command! -nargs=1 ShiftSubs lua require'nvimtitles'.shift_subs("<args>")]])
+
+  vim.cmd([[command! AddSubNumbers lua require'nvimtitles'.add_sub_numbers()]])
+  vim.cmd([[command! RemoveSubNumbers lua require'nvimtitles'.remove_sub_numbers()]])
+
+  vim.cmd([[command! PlayerQuit lua require'nvimtitles'.quit()]])
 end
 
 return M
