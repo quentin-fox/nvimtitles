@@ -276,27 +276,40 @@ function M.quit()
   socket.quit()
 end
 
-function M.setup()
+function M.setup(opts)
   vim.filetype.add({
     extension = {
       srt = "subtitle"
     }
   })
 
-  local opts = {
+  local keymap_opts = {
     silent = true,
     buffer = true
   }
 
-  vim.keymap.set('n', '-', M.seek_backward, opts)
-  vim.keymap.set('n', '=', M.seek_forward, opts)
-  vim.keymap.set('n', '<Cr>', M.cycle_pause, opts)
-  vim.keymap.set('n', '<Bar>', M.set_timestamp, opts)
-  vim.keymap.set('n', '_', M.seek_by_start, opts)
-  vim.keymap.set('n', '+', M.seek_by_stop, opts)
-  vim.keymap.set('n', '[[', M.dec_speed, opts)
-  vim.keymap.set('n', ']]', M.inc_speed, opts)
-  vim.keymap.set('n', '\\', M.find_current_sub, opts)
+  local keymap = opts.keymap or {}
+
+  local seek_backward_map = keymap.seek_backward or '-'
+  local seek_forward_map = keymap.seek_forward or '='
+  local cycle_pause_map = keymap.seek_forward or '<Cr>'
+  local set_timestamp_map = keymap.set_timestamp or '<Cr>'
+  local set_timestamp_map = keymap.set_timestamp or '<Bar>'
+  local seek_by_start_map = keymap.seek_by_start or '_'
+  local seek_by_stop_map = keymap.seek_by_start or '+'
+  local dec_speed_map = keymap.dec_speed or '[['
+  local inc_speed_map = keymap.inc_speed or ']]'
+  local find_current_sub_map = keymap.find_current_sub or '\\'
+
+  vim.keymap.set('n', seek_backward_map, M.seek_backward, keymap_opts)
+  vim.keymap.set('n', seek_forward_map, M.seek_forward, keymap_opts)
+  vim.keymap.set('n', cycle_pause_map, M.cycle_pause, keymap_opts)
+  vim.keymap.set('n', set_timestamp_map, M.set_timestamp, keymap_opts)
+  vim.keymap.set('n', seek_by_start_map, M.seek_by_start, keymap_opts)
+  vim.keymap.set('n', seek_by_stop_map, M.seek_by_stop, keymap_opts)
+  vim.keymap.set('n', dec_speed_map, M.dec_speed, keymap_opts)
+  vim.keymap.set('n', inc_speed_map, M.inc_speed, keymap_opts)
+  vim.keymap.set('n', find_current_sub_map, M.find_current_sub, keymap_opts)
 
   vim.api.nvim_create_autocmd('ExitPre', {
     buffer = 0,
